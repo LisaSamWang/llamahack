@@ -1,10 +1,13 @@
 import gradio as gr
+import requests
+
+url = 'http://localhost:8000/chat'
+
 
 def yes_man(message, history):
-    if message.endswith("?"):
-        return "Yes"
-    else:
-        return "Ask me anything!"
+    x = requests.post(url, json={'prompt': message, 'history': history})
+    print(x.text)
+
 
 gr.ChatInterface(
     yes_man,
