@@ -11,7 +11,7 @@ load_dotenv()
 
 @app.get("/")
 def read_root(request: Request):
-    return {"message": "Welcome to the Mental Health Chatbot API!"}
+    return {"message": "Welcome to the Mr. Testimony Chatbot API!"}
 
 
 @app.post("/chat")
