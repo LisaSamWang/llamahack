@@ -38,11 +38,14 @@ with gr.Blocks() as demo:
                 textbox=gr.Textbox(placeholder="Ask me anything about the trial", container=False, scale=7, render=False),
                 description="Ask Mr. Testimony any question about your audio clip and he will answer it to the best of his ability.",
                 theme="soft",
-                examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
+                examples=["Did Trump inflate his financial siatuation?"],
                 cache_examples=True,
                 retry_btn=None,
                 undo_btn="Delete Previous",
                 clear_btn="Clear",
             )
 # Launch the app
-demo.launch(share=True)
+url_info = demo.launch(share=True)
+time.sleep(5)
+with open('gradio_url.txt', 'w') as file:
+    file.write(url_info["url"])  # Write the main URL
