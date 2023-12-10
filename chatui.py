@@ -1,27 +1,48 @@
 import gradio as gr
 import requests
 
-url = "http://localhost:8000/chat"
+url = "http://localhost:8000"
 
 
 def send_message(message, history):
+    print("sending message")
     form_data = {
         "prompt": message
     }
-    response = requests.post(url, data=form_data)
+    response = requests.post(url + "/chat", data=form_data)
     return response.json()["response"]
 
 
-gr.ChatInterface(
-    send_message,
-    chatbot=gr.Chatbot(height=500),
-    textbox=gr.Textbox(placeholder="Ask me anything about the trial", container=False, scale=7),
-    title="Mr. Testimony",
-    description="Ask Mr. Testimony any question",
-    theme="soft",
-    examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
-    cache_examples=True,
-    retry_btn=None,
-    undo_btn="Delete Previous",
-    clear_btn="Clear",
-).launch()
+def submit_audio(audio_data):
+    print("submitting audio")
+    form_data = {
+        "audio": audio_data
+    }
+    response = requests.post(url + "/uploadaudio", data=form_data)
+    return response.text
+
+
+with gr.Blocks() as demo:
+    with gr.Row():
+        with gr.Column():
+            gr.Markdown(
+                """
+                # Mr. Testimony
+                """)
+            audio_upload = gr.Audio(sources="upload", label="Upload Audio File")
+            submit_buttom = gr.Button(value="Submit")
+            submit_buttom.click(submit_audio, inputs=audio_upload, outputs=[], show_progress=True)
+            chat = gr.ChatInterface(
+                send_message,
+                chatbot=gr.Chatbot(height=500, render=False),
+                textbox=gr.Textbox(placeholder="Ask me anything about the trial", container=False, scale=7, render=False),
+                description="Ask Mr. Testimony any question about your audio clip and he will answer it to the best of his ability.",
+                theme="soft",
+                examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
+                cache_examples=True,
+                retry_btn=None,
+                undo_btn="Delete Previous",
+                clear_btn="Clear",
+            )
+# Launch the app
+demo.launch()
