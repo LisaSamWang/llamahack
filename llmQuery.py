@@ -1,10 +1,10 @@
-from claude_api import Client
 from mongoQuery import get_result
-import openai
-import streamlit as st
+from openai import OpenAI
+from dotenv import load_dotenv
 
+load_dotenv()
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI()
 
 
 def get_llm_result(query):
@@ -12,22 +12,21 @@ def get_llm_result(query):
     
     res = get_result(query)
     user_query = query
-    context1 = res[0]['Context']
-    fileName1 = res[0]['Filename'].split('/')[-1]
-    context2 = res[1]['Context']
-    fileName2 = res[1]['Filename'].split('/')[-1]
+    
+    conversation_1 = res[0]["Text"]
+    conversation_2 = res[1]["Text"]
+    conversation_3 = res[2]["Text"]
 
     summary_prompt = [
-        {"role": "system", "content": "You are a helpful doctor from MIT giving a helpful recommendation to your patient so that he can pick the best insurance."},
-        {"role": "user", "content": f"The patient has the following question: {user_query}. Answer the question detailing a summary of each policy. First set of Relevant policies: {context1} from Policy {fileName1}, second set of relevant policies: {context2} from Policy {fileName2}. Include the policy name on each response. Finally, respond in a paragraph recommending your patient what to pick and consider. The response should be clean, cohesive, conscise and empathic."}
+        {"role": "system", "content": "You are a helpful legal from Harvard helping the jury recall testimony from a trial or deposition. The jury has a question about the trial/deposition and you are tasked with finding the relevant information."},
+        {"role": "user", "content": f"The jury has the following question: {user_query}. You are given 3 relevant conversations from vector embeddings, with each conversation having 12 sentences. The first conversation is {conversation_1}, the second conversation is {conversation_2}, and the third conversation is {conversation_3}. You should read each conversation and determine which sentences in each conversation is most relevan to the jury's question. You should then return the relevant sentences for each conversation, ensuring continuity (e.g. sentence 1-10, 2-9, 3-11, etc.) You cannot alter any of the sentences in the conversation as it is spoken words. The response should be clean and cohesive."}
     ]
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+    response = client.chat.completions.create(
+        model="gpt-4-1106-preview",
         messages=summary_prompt
     )
-    
-    response_res = response['choices'][0]['message']['content']
+    response_res = response.choices[0].message.content
     print("LLM response OK")
-    #print(f'LLM response:{response_res}')
+    # print(f'LLM response:{response_res}')
     return response_res

@@ -1,8 +1,12 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from dotenv import load_dotenv
 import cohere
+import os
 
-uri = ""
+load_dotenv()
+
+uri = os.getenv("MONGO_URI")
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
@@ -13,26 +17,24 @@ try:
 except Exception as e:
     print(e)
 
-dbname = client['Insurance']
-chunks_collection = dbname['Chunks']
+dbname = client['llama']
+convo_collection = dbname['convos']
 
-api_key = ''
-co = cohere.Client(api_key)
+co = cohere.Client()
 
 
 def get_result(query):
 #Query
-    #query = "I am 29 years old patient concenr about insurance because I do a lot of sport"
     query_embedding = co.embed(texts=[query], model='small').embeddings[0]
 
-    results = chunks_collection.aggregate([
+    results = convo_collection.aggregate([
         {
-            '$search': {
-                "index": "ChunksSemanticSearch",
-                "knnBeta": {
-                    "vector": query_embedding,
-                    "k": 3,
-                    "path": "embedding"}
+            '$vectorSearch': {
+                "index": "vector_index",
+                "queryVector": query_embedding,
+                "path": "Embeddings",
+                "numCandidates": 3,
+                "limit": 3
             }
         }
     ])

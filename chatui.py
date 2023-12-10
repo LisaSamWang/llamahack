@@ -1,20 +1,23 @@
 import gradio as gr
 import requests
 
-url = 'http://localhost:8000/chat'
+url = "http://localhost:8000/chat"
 
 
-def yes_man(message, history):
-    x = requests.post(url, json={'prompt': message, 'history': history})
-    print(x.text)
+def send_message(message, history):
+    form_data = {
+        "prompt": message
+    }
+    response = requests.post(url, data=form_data)
+    return response.json()["response"]
 
 
 gr.ChatInterface(
-    yes_man,
-    chatbot=gr.Chatbot(height=300),
-    textbox=gr.Textbox(placeholder="Ask me a yes or no question", container=False, scale=7),
-    title="Yes Man",
-    description="Ask Yes Man any question",
+    send_message,
+    chatbot=gr.Chatbot(height=500),
+    textbox=gr.Textbox(placeholder="Ask me anything about the trial", container=False, scale=7),
+    title="Mr. Testimony",
+    description="Ask Mr. Testimony any question",
     theme="soft",
     examples=["Hello", "Am I cool?", "Are tomatoes vegetables?"],
     cache_examples=True,
