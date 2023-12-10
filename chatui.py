@@ -24,4 +24,4 @@ gr.ChatInterface(
     retry_btn=None,
     undo_btn="Delete Previous",
     clear_btn="Clear",
-).launch(share=True)
+).launch()
