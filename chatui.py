@@ -45,4 +45,4 @@ with gr.Blocks() as demo:
                 clear_btn="Clear",
             )
 # Launch the app
-demo.launch()
+demo.launch(share=True)
