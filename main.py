@@ -1,6 +1,7 @@
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Form, File, Annotated
+from fastapi import FastAPI, Request, Form, File
+from typing import Annotated
 from llmQuery import get_llm_result
 from speech_to_text import convert_speech_to_text
 app = FastAPI()
